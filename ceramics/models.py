@@ -60,5 +60,27 @@ class Product(models.Model):
         verbose_name_plural = "陶瓷产品"
         ordering = ['-created_at']  # 默认按时间倒序排列，最新的排在最前面
 
+    @property
+    def embed_video_url(self):
+        """自动把普通 YouTube 链接转换为可嵌入的 iframe 链接"""
+        if not self.video_url:
+            return None
+
+        url = self.video_url
+        video_id = ""
+
+        # 处理普通链接 (https://www.youtube.com/watch?v=xxxxxx)
+        if "youtube.com/watch?v=" in url:
+            video_id = url.split("v=")[1].split("&")[0]
+        # 处理手机端短链接 (https://youtu.be/xxxxxx)
+        elif "youtu.be/" in url:
+            video_id = url.split("youtu.be/")[1].split("?")[0]
+
+        if video_id:
+            return f"https://www.youtube.com/embed/{video_id}"
+
+        # 如果不是 YouTube 链接，原样返回
+        return url
+
     def __str__(self):
         return self.name

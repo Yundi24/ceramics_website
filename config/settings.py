@@ -123,3 +123,6 @@ MEDIA_URL = '/media/'
 
 # 媒体文件存放在你电脑/服务器硬盘上的真实绝对路径
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# 修复 YouTube 嵌入 Error 153 的问题
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
