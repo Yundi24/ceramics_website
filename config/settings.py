@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ceramics',
 ]
 
 MIDDLEWARE = [
@@ -115,3 +117,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# 媒体文件（用户上传的图片/视频）的基础 URL
+MEDIA_URL = '/media/'
+
+# 媒体文件存放在你电脑/服务器硬盘上的真实绝对路径
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
