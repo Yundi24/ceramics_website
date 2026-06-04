@@ -10,11 +10,14 @@
     <!-- 这里预留给第六阶段写 Facebook Open Graph 标签 -->
     {% block og_tags %}{% endblock %}
 </head>
-<body class="bg-light">
+<body>
     <!-- 简单的导航栏 -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <nav class="navbar navbar-expand-lg bg-body-secondary mb-4">
         <div class="container">
             <a class="navbar-brand" href="/">🏛️ My Ceramic Shop</a>
+            <button id="darkModeToggle" class="btn btn-outline-secondary border-0 fs-5" title="Toggle Dark Mode">
+                🌙
+            </button>
         </div>
     </nav>
 
@@ -25,5 +28,45 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 暗色模式 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const htmlElement = document.documentElement;
+            const toggleBtn = document.getElementById('darkModeToggle');
+
+            // 1. 获取本地存储的偏好，或者获取操作系统的偏好
+            const getPreferredTheme = () => {
+                const storedTheme = localStorage.getItem('theme');
+                if (storedTheme) {
+                    return storedTheme;
+                }
+                // 如果本地没有记录，则检查手机系统是不是暗色模式
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            };
+
+            // 2. 设置主题的函数
+            const setTheme = (theme) => {
+                // 修改 <html> 标签的 data-bs-theme 属性，Bootstrap 会自动切换全站颜色！
+                htmlElement.setAttribute('data-bs-theme', theme);
+                // 切换按钮图标
+                toggleBtn.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+            };
+
+            // 3. 网页加载时，立刻应用主题
+            setTheme(getPreferredTheme());
+
+            // 4. 监听按钮点击事件
+            toggleBtn.addEventListener('click', () => {
+                const currentTheme = htmlElement.getAttribute('data-bs-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+                // 设置新主题
+                setTheme(newTheme);
+                // 存入 LocalStorage，下次打开网页直接生效
+                localStorage.setItem('theme', newTheme);
+            });
+        });
+    </script>
+
 </body>
 </html>
