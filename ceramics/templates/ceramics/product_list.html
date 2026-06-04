@@ -1,27 +1,72 @@
 {% extends 'ceramics/base.html' %}
 
 {% block content %}
-<h2 class="mb-4 text-center">New Arrivals</h2>
-<!-- row-cols-1 是手机端(单列)，row-cols-md-3 是电脑端(三列) -->
-<div class="row row-cols-1 row-cols-md-3 g-4">
-    {% for product in products %}
-    <div class="col">
-        <div class="card h-100 shadow-sm">
-            <!-- 封面图 -->
-            {% if product.image %}
-            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="object-fit: cover; height: 300px;">
-            {% endif %}
-            
-            <div class="card-body">
-                <h5 class="card-title">{{ product.name }}</h5>
-                <p class="card-text text-muted">{{ product.short_description }}</p>
-                <!-- 点击查看详情 -->
-                <a href="{% url 'product_detail' product.pk %}" class="btn btn-outline-secondary w-100">View Details</a>
+<div class="mb-4">
+    <!-- 1. 搜索框表单 -->
+    <form method="GET" action="{% url 'product_list' %}" class="mb-4">
+        <!-- 隐藏域：搜索时保持当前的分类过滤状态 -->
+        {% if current_category %}
+        <input type="hidden" name="category" value="{{ current_category }}">
+        {% endif %}
+
+        <div class="input-group input-group-lg shadow-sm">
+            <input type="search" name="q" class="form-control" placeholder="Search ceramics..." value="{{ current_query }}">
+            <button class="btn btn-primary" type="submit">🔍 Search</button>
+        </div>
+    </form>
+
+    <!-- 2. 分类按钮 (在手机上可以横向滑动) -->
+    <div class="d-flex overflow-auto pb-2" style="white-space: nowrap; -webkit-overflow-scrolling: touch;">
+        <!-- 'All' 按钮：清空分类参数，但保留搜索词 -->
+        <a href="?{% if current_query %}q={{ current_query }}{% endif %}"
+           class="btn rounded-pill me-2 {% if not current_category %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+           All Products
+        </a>
+
+        <!-- 循环渲染所有分类 -->
+        {% for cat in categories %}
+        <a href="?category={{ cat.slug }}{% if current_query %}&q={{ current_query }}{% endif %}"
+           class="btn rounded-pill me-2 {% if current_category == cat.slug %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+           {{ cat.name }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- 分割线 -->
+<hr class="mb-4 text-muted">
+
+<!-- 3. 产品展示区域 -->
+{% if products %}
+    <!-- 如果有产品，正常渲染网格 -->
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="object-fit: cover; height: 300px;">
+                {% endif %}
+                <div class="card-body">
+                    <span class="badge bg-secondary mb-2">{{ product.category.name }}</span>
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted">{{ product.short_description }}</p>
+                    <a href="{% url 'product_detail' product.pk %}" class="btn btn-outline-secondary w-100">View Details</a>
+                </div>
             </div>
         </div>
+        {% endfor %}
     </div>
-    {% empty %}
-    <p class="text-center w-100">No products available at the moment.</p>
-    {% endfor %}
-</div>
+{% else %}
+    <!-- 如果没有产品，渲染绝对居中的空状态 -->
+    <!-- min-height: 50vh 保证了这个区块至少有半个屏幕那么高，实现垂直居中 -->
+    <div class="d-flex flex-column justify-content-center align-items-center w-100" style="min-height: 50vh;">
+        <!-- 放一个大号的 Emoji 或图标增加视觉趣味 -->
+        <!-- <div class="mb-3" style="font-size: 4rem; opacity: 0.5;">🏺</div> -->
+        <h3 class="fw-bold text-muted mb-2">No products found. 😢</h3>
+        <p class="text-muted mb-4">Try adjusting your search or category filter.</p>
+        <a href="{% url 'product_list' %}" class="btn btn-primary rounded-pill px-4 shadow-sm">
+            Clear Filters
+        </a>
+    </div>
+{% endif %}
 {% endblock %}
