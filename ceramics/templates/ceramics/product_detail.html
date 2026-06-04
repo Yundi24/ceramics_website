@@ -18,9 +18,6 @@
     <!-- 卡片的预览大图 -->
     {% if product.image %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}" />
-    <!-- 建议加入图片的宽高等比例，让 FB 爬虫加载更快 -->
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
     {% endif %}
 {% endblock %}
 
