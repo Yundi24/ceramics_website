@@ -1,6 +1,29 @@
 {% extends 'ceramics/base.html' %}
 
+<!-- 1. 注入网页标题 -->
 {% block title %}{{ product.name }} | My Ceramic{% endblock %}
+
+<!-- 2. 注入 Facebook Open Graph 标签 -->
+{% block og_tags %}
+    <!-- 告诉 FB 这是一个网站链接 -->
+    <meta property="og:type" content="website" />
+    <!-- 卡片的标题（加粗大字） -->
+    <meta property="og:title" content="{{ product.name }} | My Ceramic" />
+    <!-- 卡片的描述（标题下方的小字），这里用上了我们之前设计的 short_description -->
+    <meta property="og:description" content="{{ product.short_description }}" />
+
+    <!-- 生成当前网页的完整 URL -->
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+
+    <!-- 卡片的预览大图 -->
+    {% if product.image %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}" />
+    <!-- 建议加入图片的宽高等比例，让 FB 爬虫加载更快 -->
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    {% endif %}
+{% endblock %}
+
 
 {% block content %}
 <div class="card shadow border-0 mb-5">
