@@ -1,0 +1,27 @@
+{% extends 'ceramics/base.html' %}
+
+{% block content %}
+<h2 class="mb-4 text-center">New Arrivals</h2>
+<!-- row-cols-1 是手机端(单列)，row-cols-md-3 是电脑端(三列) -->
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for product in products %}
+    <div class="col">
+        <div class="card h-100 shadow-sm">
+            <!-- 封面图 -->
+            {% if product.image %}
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="object-fit: cover; height: 300px;">
+            {% endif %}
+            
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text text-muted">{{ product.short_description }}</p>
+                <!-- 点击查看详情 -->
+                <a href="{% url 'product_detail' product.pk %}" class="btn btn-outline-dark w-100">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-center w-100">No products available at the moment.</p>
+    {% endfor %}
+</div>
+{% endblock %}

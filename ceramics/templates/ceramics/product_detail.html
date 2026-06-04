@@ -1,0 +1,42 @@
+{% extends 'ceramics/base.html' %}
+
+{% block title %}{{ product.name }} | My Ceramic{% endblock %}
+
+{% block content %}
+<div class="card shadow border-0 mb-5">
+    <div class="card-body p-4">
+        <!-- 标题 -->
+        <h1 class="card-title text-center mb-4">{{ product.name }}</h1>
+        
+        <!-- 大图 -->
+        {% if product.image %}
+        <div class="text-center mb-4">
+            <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+        </div>
+        {% endif %}
+
+        <!-- YouTube 视频嵌入 (如果有的话) -->
+        {% if product.video_url %}
+        <div class="ratio ratio-16x9 mb-4">
+            <!-- 这里简单用 iframe 演示，后续你可以用正则提取 YouTube ID -->
+            <iframe src="{{ product.video_url }}" allowfullscreen></iframe>
+        </div>
+        {% endif %}
+
+        <!-- 详细描述 -->
+        <div class="mb-5">
+            <h4 class="border-bottom pb-2">Description</h4>
+            <!-- linebreaks 标签可以将数据库里的换行符转为 HTML 的 <br> -->
+            <p>{{ product.description|linebreaks }}</p>
+        </div>
+
+        <!-- 💣 转化核武器：WhatsApp 联系按钮 -->
+        <!-- 注意：将 1234567890 换成你朋友的真实 WhatsApp 手机号(带国际区号,不加+) -->
+<!--        <a href="https://wa.me/1234567890?text=Hi, I am interested in your {{ product.name }}." -->
+<!--           target="_blank" -->
+<!--           class="btn btn-success btn-lg w-100 fw-bold shadow-sm">-->
+<!--           💬 Chat on WhatsApp to Buy-->
+<!--        </a>-->
+    </div>
+</div>
+{% endblock %}

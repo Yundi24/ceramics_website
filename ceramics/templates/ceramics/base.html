@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- 移动端优先：告诉手机浏览器不要缩放页面 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Ceramic{% endblock %}</title>
+    <!-- 引入 Bootstrap 5 (UI 框架) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 这里预留给第六阶段写 Facebook Open Graph 标签 -->
+    {% block og_tags %}{% endblock %}
+</head>
+<body class="bg-light">
+    <!-- 简单的导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">🏛️ My Ceramic Shop</a>
+        </div>
+    </nav>
+
+    <!-- 网页核心内容，子页面会替换掉 block content -->
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
