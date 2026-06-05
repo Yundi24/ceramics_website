@@ -98,33 +98,42 @@ class Product(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.image and not self.thumbnail:
-            # 1. 打开原图
-            img = Image.open(self.image)
+        is_new_image = False  # 状态标记
 
-            # 兼容性处理：防止极其罕见的 P 模式（调色板模式）报错，统一转为支持透明的 RGBA
+        if self.pk:  # 如果 self.pk 存在，说明这是“修改旧商品”
+            try:
+                old_product = Product.objects.get(pk=self.pk)
+                # 对比：数据库里的旧图 != 前端刚传上来的新图
+                if old_product.image != self.image:
+                    is_new_image = True
+                    # 删除旧图
+                    if old_product.image:
+                        old_product.image.delete(save=False)
+                    if old_product.thumbnail:
+                        old_product.thumbnail.delete(save=False)
+            except Product.DoesNotExist:
+                pass
+        else:
+            # 如果 self.pk 不存在，说明是“新建商品”，那肯定是新图
+            is_new_image = True
+
+        if self.image and is_new_image:
+            img = Image.open(self.image)
             if img.mode == "P":
                 img = img.convert("RGBA")
 
-            # 提取原文件名
             file_name = os.path.splitext(os.path.basename(self.image.name))[0]
 
-            # ========================
-            # 【操作 A：生成缩略图 (纯 WebP)】
-            # ========================
+            # 操作 A：生成缩略图 (纯 WebP)
             thumb_img = img.copy()
             thumb_img.thumbnail((800, 800), Image.Resampling.LANCZOS)
             thumb_io = BytesIO()
-            # 质量设为 80，兼顾肉眼画质和极致压缩
             thumb_img.save(thumb_io, format='WEBP', quality=80)
             self.thumbnail.save(f"{file_name}_thumb.webp", ContentFile(thumb_io.getvalue()), save=False)
 
-            # ========================
-            # 【操作 B：优化高清大图 (纯 WebP)】
-            # ========================
+            # 操作 B：优化高清大图 (纯 WebP)
             img.thumbnail((2500, 2500), Image.Resampling.LANCZOS)
             hq_io = BytesIO()
-            # 详情页大图质量设为 90，保留绝佳的陶瓷质感
             img.save(hq_io, format='WEBP', quality=90)
             self.image.save(f"{file_name}_hq.webp", ContentFile(hq_io.getvalue()), save=False)
 
