@@ -1,4 +1,8 @@
 from django.db import models
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
+import os
 
 # Create your models here.
 # 1. 分类模型 (Category)
@@ -40,7 +44,15 @@ class Product(models.Model):
 
     # 媒体文件
     # upload_to 意思是图片会按年月自动分文件夹保存，比如 media/products/2026/06/
-    image = models.ImageField(upload_to='products/%Y/%m/', verbose_name="主图(封面)")
+    # 1. 详情页用的高清大图
+    image = models.ImageField(upload_to='products/%Y/%m/', verbose_name="高清大图")
+
+    # 2. 用于列表和 Facebook 的缩略图
+    thumbnail = models.ImageField(
+        upload_to='products/thumbnails/%Y/%m/',
+        blank=True, null=True,
+        verbose_name="缩略图 (系统自动生成)"
+    )
 
     # 视频链接（可选，所以 blank=True）
     video_url = models.URLField(
@@ -84,3 +96,42 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        # 拦截判断：如果上传了新图片，并且还没有生成同名的缩略图
+        if self.image and not self.thumbnail:
+            # 打开原图
+            img = Image.open(self.image)
+            if img.mode in ("RGBA", "P"):
+                img = img.convert("RGB")
+
+            # 【操作 A：生成缩略图 (用于 Facebook 和列表)】
+            # 复制一份图片对象来做缩略图，避免影响原图
+            thumb_img = img.copy()
+            thumb_img.thumbnail((800, 800), Image.Resampling.LANCZOS)
+            thumb_io = BytesIO()
+            thumb_img.save(thumb_io, format='JPEG', quality=80)
+
+            # 获取原文件名
+            file_name = os.path.splitext(os.path.basename(self.image.name))[0]
+
+            # 把缩略图存进新字段
+            self.thumbnail.save(
+                f"{file_name}_thumb.jpg",
+                ContentFile(thumb_io.getvalue()),
+                save=False
+            )
+
+            # 【操作 B：优化高清大图 (防备 16MB 杀手)】
+            # 即便是详情页，我们也把它限制在 2500 像素以内，转换为极高质量的 JPG (95%)
+            # 这样 16MB 的 PNG 也会变成 1MB 左右的极品高清 JPG，网页加载瞬间提升！
+            img.thumbnail((2500, 2500), Image.Resampling.LANCZOS)
+            hq_io = BytesIO()
+            img.save(hq_io, format='JPEG', quality=95)
+            self.image.save(
+                f"{file_name}_hq.jpg",
+                ContentFile(hq_io.getvalue()),
+                save=False
+            )
+
+        super().save(*args, **kwargs)
