@@ -17,7 +17,7 @@
 
     <!-- 卡片的预览大图 -->
     {% if product.image %}
-    <meta property="og:image" content="https://{{ request.get_host }}{{ product.image.url }}" />
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}" />
     {% endif %}
 {% endblock %}
 
