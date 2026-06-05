@@ -126,3 +126,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # 修复 YouTube 嵌入 Error 153 的问题
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# 信任代理服务器发来的 HTTPS 标头
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
