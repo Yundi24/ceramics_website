@@ -43,8 +43,10 @@
         {% for product in products %}
         <div class="col">
             <div class="card h-100 shadow-sm border-0">
-                {% if product.image %}
-                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="object-fit: cover; height: 300px;">
+                {% if product.thumbnail %}
+                    <img src="{{ product.thumbnail.url }}" class="card-img-top" alt="{{ product.name }}" style="object-fit: cover; height: 300px;">
+                    {% elif product.image %}
+                    <img src="{{ product.image.url }}" ...>
                 {% endif %}
                 <div class="card-body">
                     <span class="badge bg-secondary mb-2">{{ product.category.name }}</span>
